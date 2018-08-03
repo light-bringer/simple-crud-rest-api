@@ -7,9 +7,7 @@ module.exports = {
       name: "test",
       host: "localhost",
       port: "27017",
-      path : () =>{
-          return "mongodb://" + this.database.host + ":" + this.database.port;
-        }
+      path : "mongodb://localhost:27017/test"
     },
     projectName : 'barebone-node-api-server'
   };
