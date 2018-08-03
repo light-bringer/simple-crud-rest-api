@@ -30,7 +30,8 @@ db.init(function(err) {
   var server =  app.listen(app.get('port'));
   console.log('Express server listening on port ' + server.address().port);
   var options = {db: db.client};
-  app.use('/', require(appDir + '/app/routes'));
+  app.use('/', require(appDir + '/routes'));
+  //app.use('/calculus/*', require());
   app.use(express.static(__dirname + '/public'));
 })
 

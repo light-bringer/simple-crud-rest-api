@@ -3,3 +3,5 @@ const express = require('express')
 , appDir = config.appDir
 , router = express.Router()
 
+
+module.exports = router
