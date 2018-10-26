@@ -11,7 +11,7 @@ if(!isThere(envFilePath))
 else
   environmentOptions = require(envFilePath);
 console.log(__dirname)
-projectName = environmentOptions.projectName || "barebone-node-api-server";
+projectName = environmentOptions.projectName || "simple-crud-rest-api";
 
 module.exports = {
   port: environmentOptions.server.port,

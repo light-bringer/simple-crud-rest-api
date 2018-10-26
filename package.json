@@ -1,6 +1,6 @@
 {
-  "name": "barebone-node-api-server",
-  "version": "1.0.1",
+  "name": "simple-crud-rest-api",
+  "version": "0.0.1",
   "description": "",
   "main": "server.js",
   "scripts": {
