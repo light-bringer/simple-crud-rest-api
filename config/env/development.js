@@ -9,5 +9,5 @@ module.exports = {
       port: "27017",
       path : "mongodb://localhost:27017/test"
     },
-    projectName : 'barebone-node-api-server'
+    projectName : 'simple-crud-rest-api'
   };
