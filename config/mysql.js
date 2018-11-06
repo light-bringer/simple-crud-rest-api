@@ -5,11 +5,15 @@ const config = require('./index');
 
 
 let connection = mysql.createPool({
-    host: config.mongodb.databaseHost,
-    port: config.mongodb.databasePort,
-    user: config.mongodb.databaseUser,
-    password: config.mysql.databasePwd,
-    database: config.mysql.databaseName
+    // connectionLimit : 1000,
+    // connectTimeout  : 60 * 60 * 1000,
+    // aquireTimeout   : 60 * 60 * 1000,
+    // timeout         : 60 * 60 * 1000,
+    host            : config.mysql.databaseHost,
+    port            : config.mysql.databasePort,
+    user            : config.mysql.databaseUser,
+    password        : config.mysql.databasePwd,
+    database        : config.mysql.databaseName
 });
 
 
