@@ -5,8 +5,11 @@ const bodyParser = require('body-parser');
 const _          = require('lodash');
 const config     = require(__dirname + '/config');
 const appDir     = config.appDir;
-const db         = require(appDir + '/config/mongodb.js');
+// using mySQL connection
+const db         = require(appDir + '/config/mysql.js');
+const v1    = require(appDir + '/routes/v1');
 const app        = express();
+
   
 app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.json({limit: '50mb'}));
@@ -25,6 +28,9 @@ app.use((req, res, next)=> {
   next();
 });
 
+
+/*
+// MongoDB server connection init()
 db.init(function(err) {
   var server =  app.listen(app.get('port'));
   console.log('Express server listening on port ' + server.address().port);
@@ -32,4 +38,15 @@ db.init(function(err) {
   app.use('/', require(appDir + '/routes'));
   app.use(express.static(__dirname + '/public'));
 })
+*/
+let options =  {
+  db : db
+};
+app.set('options', options);
+app.use('/v1', v1);
+app.use(express.static(__dirname + '/public'));
 
+
+
+var server =  app.listen(app.get('port'));
+console.log('Express server listening on port ' + server.address().port);

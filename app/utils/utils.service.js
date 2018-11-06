@@ -31,7 +31,7 @@ module.exports.ReE = (res, err, code)=> {
 module.exports.ReS = (res, data, code)=> {
     // Success Web Response
     let send_data = {
-        success:true
+        success: true
     };
     if(typeof data == 'object'){
         send_data = Object.assign(data, send_data);
@@ -52,7 +52,7 @@ module.exports.TE = TE = (err_message, log)=> {
 };
 
 
-module.exports.mongodb.modifyCursor = module.exports.modifyCursor = (cursor, cursorOptions)=> {
+module.exports.modifyCursor =  (cursor, cursorOptions)=> {
   Object.keys(cursorOptions).forEach((option)=>{
       cursor[option](cursorOptions[option]);
   });
