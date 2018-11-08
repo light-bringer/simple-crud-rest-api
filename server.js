@@ -5,7 +5,16 @@ const bodyParser = require('body-parser');
 const _          = require('lodash');
 const config     = require(__dirname + '/config');
 const appDir     = config.appDir;
-// using mySQL connection
+const logger     = require(appDir + '/config' + '/loggerconfig');
+
+// init() logger
+let loggerObj;
+logger.init();
+loggerObj = logger.loggerObj;
+
+
+loggerObj.info("Hi");
+loggerObj.error("Error");
 const db         = require(appDir + '/config/mysql.js');
 const v1    = require(appDir + '/routes/v1');
 const app        = express();
