@@ -6,18 +6,15 @@ const _          = require('lodash');
 const config     = require(__dirname + '/config');
 const appDir     = config.appDir;
 const logger     = require(appDir + '/config' + '/loggerconfig');
+const db         = require(appDir + '/config/mysql.js');
+const v1         = require(appDir + '/routes/v1');
+const app        = express();
+
 
 // init() logger
 let loggerObj;
 logger.init();
 loggerObj = logger.loggerObj;
-
-
-loggerObj.info("Hi");
-loggerObj.error("Error");
-const db         = require(appDir + '/config/mysql.js');
-const v1    = require(appDir + '/routes/v1');
-const app        = express();
 
   
 app.use(express.static(__dirname + '/public'));
@@ -49,8 +46,10 @@ db.init(function(err) {
 })
 */
 let options =  {
-  db : db
+  db : db,
+  logger : loggerObj
 };
+
 app.set('options', options);
 app.use('/v1', v1);
 app.use(express.static(__dirname + '/public'));
