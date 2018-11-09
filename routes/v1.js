@@ -14,5 +14,6 @@ router.get('/',  HelloWorldController.helloworld);
 
 // Messages CRUD
 router.get('/messages/all', MessagesController.getAll);
+router.post('/messages/insert', MessagesController.insertOne);
 
 module.exports = router;

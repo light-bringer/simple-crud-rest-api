@@ -21,10 +21,11 @@
     "node-db-file-logger": "^1.0.4",
     "parse-error": "^0.2.0",
     "q": "^1.5.1",
-    "validator": "^10.8.0"
+    "validator": "^10.9.0"
   },
   "devDependencies": {
     "eslint": "^5.8.0",
+    "nodeload": "^0.4.0",
     "nodemon": "^1.11.0"
   }
 }

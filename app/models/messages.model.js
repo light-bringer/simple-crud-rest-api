@@ -2,6 +2,9 @@
 
 const _         = require('lodash');
 const tablename = 'messages';
+const config           = require(__dirname + '/../../config');
+const appDir           = config.appDir;
+const error            = require(appDir+ '/app/utils/errors')
 
 
 /*
@@ -73,14 +76,47 @@ mysql> desc messages;
 */
 
 
-module.exports.insert = (data)=> {
+module.exports.insertOne = async (data, options)=> {
+
+    let db = options.db;
+    let logger = options.logger;
+    let messageObj = {};
+
     if(_.isNull(data)) {
-        console.error("No Data");
+        logger.error("No Data");
+        throw new Error(error.invalidData);
+
     }
-    Object.keys(d)
-    
-    let SQLQuery = "INSERT INTO messages";
-    
+    if(_.isNull(data.phone)) {
+        logger.error("phone number cannot be NULL");
+        throw new Error(invalidData);
+    }
+    messageObj['uid_fk'] = data.phone;
+
+    if(_.isNull(data.message)) {
+        messageObj['message'] = "";
+    }
+    else {
+        messageObj['message'] = data.message;
+    }
+    let SQLQuery = 'INSERT INTO messages (uid_fk, message) VALUES ?';
+    console.log(SQLQuery)
+    console.log(data)
+    console.log(messageObj)
+
+    try {
+        let result = await db.query('INSERT INTO messages SET ?', messageObj);
+        logger.info("DB Queries inserted");
+        logger.info(result);
+
+    }
+    catch(err) {
+        if(err) {
+            logger.error(err);
+            throw new Error(error.invalidSQL);
+        }
+    }
+    return true;
 }
 
 
@@ -89,10 +125,11 @@ module.exports.getAll = async (options)=> {
     let logger = options.logger;
 
     const SQLQuery = "SELECT * FROM " + tablename;
-    logger.info("Records fetched from Table");
     let result = await db.query(SQLQuery);
+    logger.info("Records fetched from Table");
+    console.log(result);
     let result_list = [];
-    for (let i=0; i< result_list.length; i++) {
+    for (let i=0; i< result.length; i++) {
         result_list.push(result[i]);
     }
 
