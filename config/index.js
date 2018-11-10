@@ -4,13 +4,13 @@ const isThere = require('is-there')
     , currentEnv = process.env.NODE_ENV || 'development'
     , envFilePath = __dirname + "/env/" + currentEnv + ".js";
 
-var environmentOptions, projectName;
+let environmentOptions, projectName;
 
 if(!isThere(envFilePath))
   console.log("Environment File is Missing");
 else
   environmentOptions = require(envFilePath);
-console.log(__dirname)
+
 projectName = environmentOptions.projectName || "simple-crud-rest-api";
 
 module.exports = {
@@ -33,5 +33,5 @@ module.exports = {
     databasePwd: environmentOptions.database.mysql.password
 
   },
-  appDir: __dirname.match(new RegExp("(.*\/("+ projectName +")\/)(.*)$"))[1]
-}
+  appDir: require('app-root-path')
+};
