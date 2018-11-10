@@ -5,4 +5,6 @@ steps:
   args: ['install']
 - name: 'gcr.io/cloud-builders/npm'
   args: ['start']
+  env:
+  - 'NODE_ENV=development'
 timeout: "1600s"
