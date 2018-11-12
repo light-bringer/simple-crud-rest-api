@@ -2,9 +2,9 @@
 
 const _         = require('lodash');
 const tablename = 'messages';
-const config           = require(__dirname + '/../../config');
-const appDir           = config.appDir;
-const error            = require(appDir+ '/app/utils/errors')
+const config    = require(__dirname + '/../../config');
+const appDir    = config.appDir;
+const error     = require(appDir+ '/app/utils/errors');
 
 
 /*
@@ -99,15 +99,16 @@ module.exports.insertOne = async (data, options)=> {
     else {
         messageObj['message'] = data.message;
     }
-    let SQLQuery = 'INSERT INTO messages (uid_fk, message) VALUES ?';
+    let SQLQuery = 'INSERT INTO messages SET ?';
     console.log(SQLQuery)
     console.log(data)
     console.log(messageObj)
 
     try {
-        let result = await db.query('INSERT INTO messages SET ?', messageObj);
+        let result = await db.query(SQLQuery, messageObj);
         logger.info("DB Queries inserted");
         logger.info(result);
+        return result;
 
     }
     catch(err) {
@@ -116,7 +117,6 @@ module.exports.insertOne = async (data, options)=> {
             throw new Error(error.invalidSQL);
         }
     }
-    return true;
 }
 
 

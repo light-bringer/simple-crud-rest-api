@@ -59,9 +59,12 @@ module.exports.insertOne = async (req, res)=> {
         message : req.body.message
     }
     let time1 = Date.now();
-    let result = await messageModel.insertOne( postObj, options);
-    if (result) {
+    let result = {}
+    let ress = await messageModel.insertOne( postObj, options);
+    if (ress) {
         result = {
+            insertID : ress.insertId,
+            affectedRows: ress.affectedRows,
             status : "Inserted"
         };
     }
