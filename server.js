@@ -11,7 +11,6 @@ const v1         = require(appDir + '/routes/v1');
 const app        = express();
 
 
-console.log(config);
 // init() logger
 let loggerObj;
 logger.init();

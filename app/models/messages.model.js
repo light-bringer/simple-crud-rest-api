@@ -120,7 +120,27 @@ module.exports.insertOne = async (data, options)=> {
 }
 
 
+
+
+
 module.exports.getAll = async (options)=> {
+    let db = options.db;
+    let logger = options.logger;
+
+    const SQLQuery = "SELECT * FROM " + tablename;
+    let result = await db.query(SQLQuery);
+    logger.info("Records fetched from Table");
+    console.log(result);
+    let result_list = [];
+    for (let i=0; i< result.length; i++) {
+        result_list.push(result[i]);
+    }
+
+    return result_list;
+}
+
+
+module.exports.getOne = async (options, searchOptions)=> {
     let db = options.db;
     let logger = options.logger;
 

@@ -1,52 +1,140 @@
 'use strict';
 
-const {TE, to}          = require('../services/util.service');
-
-module.exports = (sequelize, DataTypes) => {
-    var Model = sequelize.define('User', {
-        first     : DataTypes.STRING,
-        last      : DataTypes.STRING,
-        email     : {type: DataTypes.STRING, allowNull: true, unique: true, validate: { isEmail: {msg: "Phone number invalid."} }},
-        phone     : {type: DataTypes.STRING, allowNull: true, unique: true, validate: { len: {args: [7, 20], msg: "Phone number invalid, too short."}, isNumeric: { msg: "not a valid phone number."} }},
-        password  : DataTypes.STRING,
-    });
+const _         = require('lodash');
+const tablename = 'users';
+const config    = require(__dirname + '/../../config');
+const appDir    = config.appDir;
+const error     = require(appDir+ '/app/utils/errors');
 
 
-    Model.beforeSave(async (user, options) => {
-        let err;
-        if (user.changed('password')){
-            let salt, hash
-            [err, salt] = await to(bcrypt.genSalt(10));
-            if(err) TE(err.message, true);
+/*
+TABLE STRUCTURE
 
-            [err, hash] = await to(bcrypt.hash(user.password, salt));
-            if(err) TE(err.message, true);
+mysql> desc messages;
++---------+---------+------+-----+---------+----------------+
+| Field   | Type    | Null | Key | Default | Extra          |
++---------+---------+------+-----+---------+----------------+
+| mid     | int(11) | NO   | PRI | NULL    | auto_increment |
+| message | text    | YES  | MUL | NULL    |                |
+| uid_fk  | int(11) | YES  |     | NULL    |                |
++---------+---------+------+-----+---------+----------------+
+3 rows in set (0.00 sec)
+*/
 
-            user.password = hash;
+/*
+**** BOOT STRAPPING THE TABLE STRUCTURE *****
+
+mysql> use rest;
+Database changed
+mysql> CREATE TABLE `messages` (
+    -> `mid` int(11) AUTO_INCREMENT,
+    -> `message` text,
+    -> `uid_fk` int(11),
+    -> PRIMARY KEY (`mid`)
+    -> );
+Query OK, 0 rows affected (0.60 sec)
+
+mysql> show tables;
++----------------+
+| Tables_in_rest |
++----------------+
+| messages       |
++----------------+
+1 row in set (0.01 sec)
+
+mysql> desc messages;
++---------+---------+------+-----+---------+----------------+
+| Field   | Type    | Null | Key | Default | Extra          |
++---------+---------+------+-----+---------+----------------+
+| mid     | int(11) | NO   | PRI | NULL    | auto_increment |
+| message | text    | YES  |     | NULL    |                |
+| uid_fk  | int(11) | YES  |     | NULL    |                |
++---------+---------+------+-----+---------+----------------+
+3 rows in set (0.03 sec)
+
+mysql> CREATE INDEX message_index ON messages(message, uid_fk);
+ERROR 2006 (HY000): MySQL server has gone away
+No connection. Trying to reconnect...
+Connection id:    15
+Current database: rest
+
+ERROR 1170 (42000): BLOB/TEXT column 'message' used in key specification without a key length
+mysql> mysql> CREATE INDEX message_index ON messages(message(200), uid_fk);
+Query OK, 0 rows affected (0.36 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> desc messages;
++---------+---------+------+-----+---------+----------------+
+| Field   | Type    | Null | Key | Default | Extra          |
++---------+---------+------+-----+---------+----------------+
+| mid     | int(11) | NO   | PRI | NULL    | auto_increment |
+| message | text    | YES  | MUL | NULL    |                |
+| uid_fk  | int(11) | YES  |     | NULL    |                |
++---------+---------+------+-----+---------+----------------+
+3 rows in set (0.00 sec)
+
+*/
+
+
+module.exports.insertOne = async (data, options)=> {
+
+    let db = options.db;
+    let logger = options.logger;
+    let messageObj = {};
+
+    if(_.isNull(data)) {
+        logger.error("No Data");
+        throw new Error(error.invalidData);
+
+    }
+    if(_.isNull(data.phone)) {
+        logger.error("phone number cannot be NULL");
+        throw new Error(invalidData);
+    }
+    messageObj['uid_fk'] = data.phone;
+
+    if(_.isNull(data.name)) {
+        messageObj['message'] = "";
+    }
+    else {
+        messageObj['message'] = data.message;
+    }
+    let SQLQuery = 'INSERT INTO messages SET ?';
+    console.log(SQLQuery)
+    console.log(data)
+    console.log(messageObj)
+
+    try {
+        let result = await db.query(SQLQuery, messageObj);
+        logger.info("DB Queries inserted");
+        logger.info(result);
+        return result;
+
+    }
+    catch(err) {
+        if(err) {
+            logger.error(err);
+            throw new Error(error.invalidSQL);
         }
-    });
+    }
+}
 
-    Model.prototype.comparePassword = async function (pw) {
-        let err, pass
-        if(!this.password) TE('password not set');
 
-        [err, pass] = await to(bcrypt_p.compare(pw, this.password));
-        if(err) TE(err);
 
-        if(!pass) TE('invalid password');
 
-        return this;
+
+module.exports.getAll = async (options)=> {
+    let db = options.db;
+    let logger = options.logger;
+
+    const SQLQuery = "SELECT * FROM " + tablename;
+    let result = await db.query(SQLQuery);
+    logger.info("Records fetched from Table");
+    console.log(result);
+    let result_list = [];
+    for (let i=0; i< result.length; i++) {
+        result_list.push(result[i]);
     }
 
-    Model.prototype.getJWT = function () {
-        let expiration_time = parseInt(CONFIG.jwt_expiration);
-        return "Bearer "+jwt.sign({user_id:this.id}, CONFIG.jwt_encryption, {expiresIn: expiration_time});
-    };
-
-    Model.prototype.toWeb = function (pw) {
-        let json = this.toJSON();
-        return json;
-    };
-
-    return Model;
-};
+    return result_list;
+}

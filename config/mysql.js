@@ -31,7 +31,6 @@ connection.getConnection((err, connection) => {
         }
     }
     if (connection) {
-        console.log("release");
         connection.release();
     }
     return;
@@ -40,5 +39,4 @@ connection.getConnection((err, connection) => {
 // Promisify for Node.js async/await.
 connection.query = util.promisify(connection.query);
 
-console.log(connection)
 module.exports = connection;
