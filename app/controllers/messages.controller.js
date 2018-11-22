@@ -81,6 +81,42 @@ module.exports.insertOne = async (req, res)=> {
 }
 
 
+module.exports.getOne = async (req, res)=> {
+    /// controller to insert one record
+    const options = req.app.get('options');
+    let logger = options.logger;
+    logger.info("inside messages search controller");
+    
+    let mid = req.params.mid;
+    
+    let postObj = {
+        uid_fk : null || req.body.phone,
+        message : null || req.body.message,
+        mid :  null || mid 
+
+    }
+    let time1 = Date.now();
+    let result = {}
+    let ress = await messageModel.getOne(options, postObj);
+    if (ress) {
+        result = {
+            result : ress,
+            status : "Searched"
+        };
+    }
+    let time2 = Date.now();
+    let timetaken = time2 - time1;
+    logger.info("Time difference : %s ms", String(timetaken)); 
+    let message = {
+        data : result,
+        time_taken : String(timetaken) + " ms"
+    };
+    logger.info(JSON.stringify(message));
+    return ReS(res, message, 200);
+
+}
+
+
 
 module.exports.search = async (req, res)=> {
     /// controller to insert one record

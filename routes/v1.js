@@ -14,6 +14,7 @@ router.get('/',  HelloWorldController.helloworld);
 
 // Messages CRUD
 router.get('/messages/', MessagesController.getAll);
+router.get('/messages/:mid', MessagesController.getOne);
 router.post('/messages/', MessagesController.insertOne);
 router.post('/messages/search', MessagesController.search)
 

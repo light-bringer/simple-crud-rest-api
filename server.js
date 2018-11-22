@@ -12,6 +12,7 @@ const appDir       = config.appDir;
 const logger       = require(appDir + '/config' + '/loggerconfig');
 const db           = require(appDir + '/config/mysql.js');
 const v1           = require(appDir + '/routes/v1');
+
 const app          = express();
 const stats        = new StatsD();
 
