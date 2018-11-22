@@ -1,14 +1,19 @@
 'use strict'
 
-const express    = require('express');
-const bodyParser = require('body-parser');
-const _          = require('lodash');
-const config     = require(__dirname + '/config');
-const appDir     = config.appDir;
-const logger     = require(appDir + '/config' + '/loggerconfig');
-const db         = require(appDir + '/config/mysql.js');
-const v1         = require(appDir + '/routes/v1');
-const app        = express();
+const express      = require('express');
+const bodyParser   = require('body-parser');
+const _            = require('lodash');
+const responseTime = require('response-time');
+const StatsD       = require('node-statsd');
+const compression  = require('compression');
+
+const config       = require(__dirname + '/config');
+const appDir       = config.appDir;
+const logger       = require(appDir + '/config' + '/loggerconfig');
+const db           = require(appDir + '/config/mysql.js');
+const v1           = require(appDir + '/routes/v1');
+const app          = express();
+const stats        = new StatsD();
 
 
 // init() logger
@@ -17,6 +22,9 @@ logger.init();
 loggerObj = logger.loggerObj;
 
 //loggerObj.error(JSON.stringify(process.env));
+
+app.use(compression());
+app.use(responseTime());
   
 app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.json({limit: '50mb'}));
