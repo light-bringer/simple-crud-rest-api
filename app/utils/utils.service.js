@@ -58,3 +58,23 @@ module.exports.modifyCursor =  (cursor, cursorOptions)=> {
   });
   return cursor;
 }
+
+
+/**
+ * Returns TRUE if the first specified array contains all elements
+ * from the second one. FALSE otherwise.
+ *
+ * @param {array} superset
+ * @param {array} subset
+ *
+ * @returns {boolean}
+ */
+
+module.exports.arrayContainsArray =  (superset, subset) => {
+    return subset.every(function (value) {
+        return (superset.indexOf(value) >= 0);
+    });
+  };
+  
+
+  
