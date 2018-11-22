@@ -13,7 +13,8 @@ const MessagesController = require(appDir + '/app/controllers/messages.controlle
 router.get('/',  HelloWorldController.helloworld);
 
 // Messages CRUD
-router.get('/messages/all', MessagesController.getAll);
-router.post('/messages/insert', MessagesController.insertOne);
+router.get('/messages/', MessagesController.getAll);
+router.post('/messages/', MessagesController.insertOne);
+router.post('/messages/search', MessagesController.search)
 
 module.exports = router;

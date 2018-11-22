@@ -4,7 +4,10 @@ const _         = require('lodash');
 const tablename = 'messages';
 const config    = require(__dirname + '/../../config');
 const appDir    = config.appDir;
-const error     = require(appDir+ '/app/utils/errors');
+const error     = require(appDir + '/app/utils/errors');
+const utils     = require(appDir + '/app/utils/utils.service')
+
+const tableKeys = ['mid', 'message', 'uid_fk'];
 
 
 /*
@@ -143,9 +146,46 @@ module.exports.getAll = async (options)=> {
 module.exports.getOne = async (options, searchOptions)=> {
     let db = options.db;
     let logger = options.logger;
+    let searchClauseArray = [];
+    let queryParams = [];
 
-    const SQLQuery = "SELECT * FROM " + tablename;
-    let result = await db.query(SQLQuery);
+    let keys = Object.keys(searchOptions);
+
+    // Query Building
+
+    console.log(searchOptions);
+
+    if(utils.arrayContainsArray(tableKeys, keys)) {
+        if(!_.isUndefined(searchOptions.mid)) {
+            searchClauseArray.push( 'mid = ?');
+            queryParams.push(searchOptions.mid);
+        }
+
+        if(!_.isUndefined(searchOptions.uid_fk)) {
+            searchClauseArray.push( 'uid_fk = ?');
+            queryParams.push(searchOptions.uid_fk);
+        }
+
+        if(!_.isUndefined(searchOptions.message)) {
+            searchClauseArray.push('message = ?');
+            queryParams.push(searchOptions.message);
+        }
+
+    }
+    else {
+        return Promise(reject(Error("Incorrect Keys")));
+    
+    }
+
+    let searchClause = searchClauseArray.join(' AND ');
+
+    console.log("SQL Query built : " + searchClause);
+
+    const SQLQuery = "SELECT * FROM " + tablename + ' WHERE ' + searchClause;
+    
+    console.log("fINAL Query built : " + SQLQuery);
+    
+    let result = await db.query(SQLQuery, queryParams);
     logger.info("Records fetched from Table");
     console.log(result);
     let result_list = [];
