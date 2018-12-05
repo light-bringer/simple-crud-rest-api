@@ -5,6 +5,8 @@ const tablename = 'users';
 const config    = require(__dirname + '/../../config');
 const appDir    = config.appDir;
 const error     = require(appDir+ '/app/utils/errors');
+const utils     = require(appDir + '/app/utils/utils.service');
+const tableKeys = ['uid', 'fname', 'lname', 'email', 'mobile'];
 
 
 /*

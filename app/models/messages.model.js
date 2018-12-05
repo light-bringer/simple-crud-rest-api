@@ -5,8 +5,7 @@ const tablename = 'messages';
 const config    = require(__dirname + '/../../config');
 const appDir    = config.appDir;
 const error     = require(appDir + '/app/utils/errors');
-const utils     = require(appDir + '/app/utils/utils.service')
-
+const utils     = require(appDir + '/app/utils/utils.service');
 const tableKeys = ['mid', 'message', 'uid_fk'];
 
 
