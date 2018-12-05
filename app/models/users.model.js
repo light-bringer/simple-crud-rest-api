@@ -10,68 +10,59 @@ const error     = require(appDir+ '/app/utils/errors');
 /*
 TABLE STRUCTURE
 
-mysql> desc messages;
-+---------+---------+------+-----+---------+----------------+
-| Field   | Type    | Null | Key | Default | Extra          |
-+---------+---------+------+-----+---------+----------------+
-| mid     | int(11) | NO   | PRI | NULL    | auto_increment |
-| message | text    | YES  | MUL | NULL    |                |
-| uid_fk  | int(11) | YES  |     | NULL    |                |
-+---------+---------+------+-----+---------+----------------+
-3 rows in set (0.00 sec)
-*/
+mysql> use rest
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
 
-/*
-**** BOOT STRAPPING THE TABLE STRUCTURE *****
-
-mysql> use rest;
 Database changed
-mysql> CREATE TABLE `messages` (
-    -> `mid` int(11) AUTO_INCREMENT,
-    -> `message` text,
-    -> `uid_fk` int(11),
-    -> PRIMARY KEY (`mid`)
-    -> );
-Query OK, 0 rows affected (0.60 sec)
-
 mysql> show tables;
 +----------------+
 | Tables_in_rest |
 +----------------+
 | messages       |
+| users          |
 +----------------+
-1 row in set (0.01 sec)
+2 rows in set (0.00 sec)
 
-mysql> desc messages;
-+---------+---------+------+-----+---------+----------------+
-| Field   | Type    | Null | Key | Default | Extra          |
-+---------+---------+------+-----+---------+----------------+
-| mid     | int(11) | NO   | PRI | NULL    | auto_increment |
-| message | text    | YES  |     | NULL    |                |
-| uid_fk  | int(11) | YES  |     | NULL    |                |
-+---------+---------+------+-----+---------+----------------+
-3 rows in set (0.03 sec)
+mysql> desc users;
++--------+--------------+------+-----+---------+-------+
+| Field  | Type         | Null | Key | Default | Extra |
++--------+--------------+------+-----+---------+-------+
+| uid    | int(11)      | NO   | PRI | NULL    |       |
+| fname  | varchar(100) | NO   |     | NULL    |       |
+| lname  | varchar(100) | NO   |     | NULL    |       |
+| email  | varchar(100) | NO   | UNI | NULL    |       |
+| mobile | varchar(11)  | NO   | UNI | NULL    |       |
++--------+--------------+------+-----+---------+-------+
+5 rows in set (0.00 sec)
 
-mysql> CREATE INDEX message_index ON messages(message, uid_fk);
-ERROR 2006 (HY000): MySQL server has gone away
-No connection. Trying to reconnect...
-Connection id:    15
-Current database: rest
 
-ERROR 1170 (42000): BLOB/TEXT column 'message' used in key specification without a key length
-mysql> mysql> CREATE INDEX message_index ON messages(message(200), uid_fk);
-Query OK, 0 rows affected (0.36 sec)
-Records: 0  Duplicates: 0  Warnings: 0
+/*
+**** BOOT STRAPPING THE TABLE STRUCTURE *****
 
-mysql> desc messages;
-+---------+---------+------+-----+---------+----------------+
-| Field   | Type    | Null | Key | Default | Extra          |
-+---------+---------+------+-----+---------+----------------+
-| mid     | int(11) | NO   | PRI | NULL    | auto_increment |
-| message | text    | YES  | MUL | NULL    |                |
-| uid_fk  | int(11) | YES  |     | NULL    |                |
-+---------+---------+------+-----+---------+----------------+
-3 rows in set (0.00 sec)
+--
+-- Table structure for table `users`
+--
+
+DROP TABLE IF EXISTS `users`;
+CREATE TABLE `users` (
+    `uid` int(11) NOT NULL,
+    `fname` varchar(100) NOT NULL,
+    `lname` varchar(100) NOT NULL,
+    `email` varchar(100) NOT NULL,
+    `mobile` varchar(11) NOT NULL,
+    PRIMARY KEY (`uid`),
+    UNIQUE KEY `uid_UNIQUE` (`uid`),
+    UNIQUE KEY `email_UNIQUE` (`email`),
+    UNIQUE KEY `mobile_UNIQUE` (`mobile`),
+    KEY `uid_index` (`uid`,`fname`,`lname`,`email`,`mobile`)
+  ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+   
+  --
+  -- Dumping data for table `users`
+  --
+  
+  
 
 */
 
