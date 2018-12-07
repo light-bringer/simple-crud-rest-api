@@ -1,10 +1,11 @@
 'use strict'
 
+const cluster      = require('cluster');
+const { cpus }     = require('os');
 const express      = require('express');
 const bodyParser   = require('body-parser');
 const _            = require('lodash');
 const responseTime = require('response-time');
-const StatsD       = require('node-statsd');
 const compression  = require('compression');
 
 const config       = require(__dirname + '/config');
@@ -12,61 +13,82 @@ const appDir       = config.appDir;
 const logger       = require(appDir + '/config' + '/loggerconfig');
 const db           = require(appDir + '/config/mysql.js');
 const v1           = require(appDir + '/routes/v1');
-
-const app          = express();
-const stats        = new StatsD();
-
+const isMaster     = cluster.isMaster;
+const numWorkers   = cpus().length;
 
 // init() logger
 let loggerObj;
 logger.init();
 loggerObj = logger.loggerObj;
 
-//loggerObj.error(JSON.stringify(process.env));
+if (isMaster) {
+  loggerObj.info(`Forking ${numWorkers} workers....`);
+  const workers = [...Array(numWorkers)].map(_=> cluster.fork());
 
-app.use(compression());
-app.use(responseTime());
+  cluster.on('online', (worker)=> {
+    loggerObj.info(`Worker ${worker.process.pid} is online and ready to work!`);
+  });
+  cluster.on('exit', (worker, exitCode, strace)=> {
+    loggerObj.error(`Worker ${worker.process.pid} is dead with exitcode ${exitCode}`);
+    loggerObj.error(`The worker has spewed up this venomous error :\n  ${strace}`);
+    loggerObj.info('Starting a new worker!');
+    cluster.fork();
+  });
+
+}
+else {
+
+  const app = express();
   
-app.use(express.static(__dirname + '/public'));
-app.use(bodyParser.json({limit: '50mb'}));
-app.use(bodyParser.urlencoded({ 
-  extended: true
-}));
-app.set('port', process.env.PORT || config.port);
-
-app.use((req, res, next)=> {
-  // allow CORS
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header( "Access-Control-Allow-Methods" , "GET,POST,PUT,DELETE,OPTIONS");
-  res.header("Access-Control-Allow-Headers", '*');
-  res.header("Access-Control-Expose-Headers", "*");
-  if (req.method === 'OPTIONS') {
-    return res.send(200);
-  }
-  next();
-});
-
-
-/*
-// MongoDB server connection init()
-db.init(function(err) {
-  var server =  app.listen(app.get('port'));
-  console.log('Express server listening on port ' + server.address().port);
-  var options = {db: db.client};
-  app.use('/', require(appDir + '/routes'));
+  app.use(compression());
+  app.use(responseTime());
   app.use(express.static(__dirname + '/public'));
-})
-*/
-let options =  {
-  db : db,
-  logger : loggerObj
-};
+  app.use(bodyParser.json({limit: '50mb'}));
+  
+  app.use(bodyParser.urlencoded({ 
+    extended: true
+  }));
 
-app.set('options', options);
-app.use('/v1', v1);
-app.use(express.static(__dirname + '/public'));
+  app.set('port', process.env.PORT || config.port);
+
+  app.use((req, res, next)=> {
+    // allow CORS
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header( "Access-Control-Allow-Methods" , "GET,POST,PUT,DELETE,OPTIONS");
+    res.header("Access-Control-Allow-Headers", '*');
+    res.header("Access-Control-Expose-Headers", "*");
+    if (req.method === 'OPTIONS') {
+      return res.send(200);
+    }
+    next();
+  });
+
+
+  /*
+  // MongoDB server connection init()
+  db.init(function(err) {
+    var server =  app.listen(app.get('port'));
+    console.log('Express server listening on port ' + server.address().port);
+    var options = {db: db.client};
+    app.use('/', require(appDir + '/routes'));
+    app.use(express.static(__dirname + '/public'));
+  })
+  */
+  let options =  {
+    db : db,
+    logger : loggerObj
+  };
+
+  app.set('options', options);
+  app.use('/v1', v1);
+  app.use(express.static(__dirname + '/public'));
 
 
 
-var server =  app.listen(app.get('port'));
-console.log('Express server listening on port ' + server.address().port);
+  let server = app.listen(app.get('port'), ()=> {
+    loggerObj.info('Express server listening on port ' + server.address().port);
+  });
+
+}
+
+
